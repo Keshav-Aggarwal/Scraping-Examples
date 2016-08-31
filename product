@@ -1,0 +1,47 @@
+//FETCH HTML, LINKS, IMAGES OF PRODUCT PAGES
+var casper = require('casper').create();
+var selecpath = require('casper').selectXPath;
+var links = '';
+casper.start('https://www.alibaba.com/Agricultural-Growing-Media_pid144');
+casper.then(function () {
+    casper.wait(100, function () {
+        casper.scrollTo(10, 300);
+    });
+    casper.wait(100, function () {
+        casper.scrollTo(10, 600);
+    });
+    casper.wait(100, function () {
+        casper.scrollTo(10, 900);
+    });
+    casper.wait(100, function () {
+        casper.scrollTo(10, 1300);
+    });
+    casper.wait(100, function () {
+        casper.scrollTo(10, 1700);
+    });
+    casper.wait(100, function () {
+        casper.scrollTo(10, 2100);
+    });
+    casper.wait(100, function () {
+        casper.scrollTo(10, 2500);
+    });
+    casper.wait(100, function () {
+        casper.scrollTo(10, 2900);
+    });
+});
+casper.wait(15000, function () {
+    console.log('working');
+    casper.capture('temp.png');
+    var imgURL = this.evaluate(function () {
+        var tempArr = [];
+        var temp = document.querySelectorAll('body > div.l-page > div.l-page-main > div.l-main-content > div.l-grid.l-grid-sub.l-grid-extra > div.l-col-main > div > div:nth-child(4) img');
+        for (var iterate = 0; iterate < temp.length; iterate++) {
+            tempArr[iterate] = temp[iterate].getAttribute('src');
+        }
+        return tempArr;
+    });
+    console.log(imgURL);
+})
+casper.run(function () {
+    casper.exit();
+});
