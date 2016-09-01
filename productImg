@@ -1,0 +1,60 @@
+//FETCH HTML, LINKS, IMAGES OF PRODUCT PAGES
+var casper = require('casper').create();
+var selecpath = require('casper').selectXPath;
+var links = '';
+var imgURL;
+casper.start('https://www.alibaba.com/Agricultural-Growing-Media_pid144');
+
+casper.then(function () {
+    
+    casper.wait(100, function () {
+        casper.scrollTo(10, 300);
+    });
+    casper.wait(100, function () {
+        casper.scrollTo(10, 600);
+    });
+    casper.wait(100, function () {
+        casper.scrollTo(10, 900);
+    });
+    casper.wait(100, function () {
+        casper.scrollTo(10, 1300);
+    });
+    casper.wait(100, function () {
+        casper.scrollTo(10, 1700);
+    });
+    casper.wait(100, function () {
+        casper.scrollTo(10, 2100);
+    });
+    casper.wait(100, function () {
+        casper.scrollTo(10, 2500);
+    });
+    casper.wait(100, function () {
+        casper.scrollTo(10, 2900);
+    });
+});
+
+casper.wait(5000, function () {
+    console.log('working');
+    casper.capture('temp.png');
+    imgURL = this.evaluate(function () {
+        var categoryFolder = 'Agriculture';
+        var subCategoryFolder = 'Agricultural Growing Media';
+        var tempArr ='';
+        var temp = document.querySelectorAll('body > div.l-page > div.l-page-main > div.l-main-content > div.l-grid.l-grid-sub.l-grid-extra > div.l-col-main > div > div:nth-child(4) img');
+        for (var iterate = 0; iterate < temp.length; iterate++) {
+            tempArr += '{"folder":"'+categoryFolder+'","subfolder":"'+subCategoryFolder+'","url":"'+temp[iterate].getAttribute('src') +'"}';
+             if(iterate != temp.length-1)
+                tempArr += ',';
+        }
+        return tempArr;
+    });
+})
+casper.wait(50,function(){
+    var fs = require('fs');
+    var myfile = 'dataFiles/productImageSrc.json';
+    fs.write(myfile, imgURL, 'w');
+    console.log(imgURL);
+})
+casper.run(function () {
+    casper.exit();
+});
