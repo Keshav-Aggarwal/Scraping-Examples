@@ -1,0 +1,76 @@
+//FETCH HTML, LINKS, IMAGES OF PRODUCT PAGES
+phantom.casperPath = 'bin/';
+phantom.injectJs('bin/bootstrap.js');var casper = require('casper').create();
+
+var casper = require('casper').create();
+
+var selecpath = require('casper').selectXPath;
+var links = '';
+casper.viewport
+casper.start('https://twitter.com');
+casper.then(function () {
+	console.log('run');
+});
+casper.thenClick(selecpath('//*[@id="doc"]/div[1]/div/div[1]/div[2]/a[3]'),function(){
+	this.sendKeys(selecpath('//*[@id="login-dialog-dialog"]/div[2]/div[2]/div[2]/form/div[1]/input'),'engg.keshav@gmail.com');
+	this.sendKeys(selecpath('//*[@id="login-dialog-dialog"]/div[2]/div[2]/div[2]/form/div[2]/input'),'twitter@123');
+	console.log('running');
+	casper.thenClick(selecpath('//*[@id="login-dialog-dialog"]/div[2]/div[2]/div[2]/form/input[1]'),function(){
+		
+	});
+});
+casper.wait(600,function(){
+	//casper.thenClick(selecpath('//*[@id="global_nav"]/tbody/tr/td[5]/a'),function(){
+	console.log('clicked');
+	casper.scrollTo(10,900);
+	//	});
+	var item = this.evaluate(function(){
+		document.querySelector('li.topbar-tweet-btn button').click();
+		//return document.querySelector('#timeline > div.timeline-tweet-box > div > form > div:nth-child(3) > div').textContent;
+	});
+	console.log(item);
+});
+
+casper.wait(5000,function(){
+	casper.capture('twitter0.png');
+});
+/*casper.wait(1,function(){
+	var item = this.evaluate(function(){
+		document.querySelector('#timeline > div.timeline-tweet-box > div > form > div:nth-child(3) > div').textContent = 'asdfasd';
+		return document.querySelector('#timeline > div.timeline-tweet-box > div > form > div:nth-child(3) > div').textContent;
+	});
+	console.log(item);
+});
+*/
+//PLAIN TWEETS
+/*
+casper.thenOpen('https://twitter.com/intent/tweet',function(){
+	this.sendKeys(selecpath('//*[@id="status"]'),'asdfasdf');
+	casper.thenClick(selecpath('//*[@id="update-form"]/div[3]/fieldset/input[2]'));
+});*/
+
+
+/*
+casper.wait(10,function(){
+	var item = this.evaluate(function(){
+		document.querySelector('#tweet-box-home-timeline > div').textContent = 'asdfasdf';
+		return document.querySelector('#tweet-box-home-timeline > div').textContent;
+	});
+	console.log(item);
+})*/
+//casper.wait(500,function(){
+	//this.sendKeys(seleccpath('#tweet-box-global > div'),'Tweet text');
+//});
+
+/*casper.waitForSelector(selecpath('#global-new-tweet-button'),function(){
+	casper.thenClick(selecpath('#global-new-tweet-button'),function(){});
+},15000);
+
+
+*/
+
+casper.run(function(){
+	casper.capture('twitter.png');
+casper.exit();
+});
+	
