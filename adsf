@@ -1,0 +1,94 @@
+//FETCH HTML, LINKS, IMAGES OF PRODUCT PAGES
+phantom.casperPath = 'bin/';
+phantom.injectJs('bin/bootstrap.js');var casper = require('casper').create();
+var casper = require('casper').create();
+var selecpath = require('casper').selectXPath;
+var links = '';
+var loopCount=0;
+var conti=true;
+casper.start('https://www.alibaba.com/Agricultural-Growing-Media_pid144');
+casper.then(function(){
+		loopCount = this.evaluate(function(){
+			return document.querySelector('.ui2-pagination-pages > span[class=disable]').textContent;
+		});
+});
+
+function scrapImagenLink(){
+	casper.then(function () {
+		if(this.currentUrl.indexOf('login')>=0)
+		{
+			casper.back();
+			casper.wait(500);
+		}
+		casper.wait(100, function () {
+			casper.scrollTo(10, 300);
+		});
+		casper.wait(100, function () {
+			casper.scrollTo(10, 600);
+		});
+		casper.wait(100, function () {
+			casper.scrollTo(10, 900);
+		});
+		casper.wait(100, function () {
+			casper.scrollTo(10, 1300);
+		});
+		casper.wait(100, function () {
+			casper.scrollTo(10, 1700);
+		});
+		casper.wait(100, function () {
+			casper.scrollTo(10, 2100);
+		});
+		casper.wait(100, function () {
+			casper.scrollTo(10, 2500);
+		});
+		casper.wait(100, function () {
+			casper.scrollTo(10, 2900);
+		});
+		casper.wait(100, function () {
+			casper.scrollTo(10, 3000);
+		});
+	});
+
+	casper.wait(5000, function () {
+		console.log('working');
+		
+		var imgURL = this.evaluate(function () {
+			var tempArr = [];
+			var temp = document.querySelectorAll('body > div.l-page > div.l-page-main > div.l-main-content > div.l-grid.l-grid-sub.l-grid-extra > div.l-col-main > div > div:nth-child(4) img');
+			for (var iterate = 0; iterate < temp.length; iterate++) {
+
+				tempArr[iterate] = '"imgURL":' + '"' + temp[iterate].getAttribute('src') + '",productLink":"' +temp[iterate].parentNode.getAttribute('href') + '"';
+			}
+			return tempArr;
+		});
+		console.log(this.currentUrl);
+		this.evaluate(function(){
+			var classNames = document.querySelector('.ui2-pagination-pages >.next').getAttribute('class');
+			if(classNames.indexOf('disable')>=0)
+			{
+				conti = false;
+			}
+		});
+	})
+	
+	casper.thenClick('.ui2-pagination-pages > a[data-role=next]',function(){
+		//loopCount--;
+		console.log('clicked');
+		
+	});
+	casper.wait(15000,function(){
+		casper.capture('temp.png');
+		this.evaluate(function(){
+		});
+	});
+	if(conti==true)
+	casper.run(function () {
+			scrapImagenLink();
+		
+	});
+	else
+		casper.exit();
+	
+}
+
+scrapImagenLink();
