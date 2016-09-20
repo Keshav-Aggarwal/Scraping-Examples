@@ -1,0 +1,232 @@
+//FETCH HTML, LINKS, IMAGES OF PRODUCT PAGES
+var casper = require('casper').create();
+var selecpath = require('casper').selectXPath;
+var links = '';
+var imgURL;
+var pageURL = 'https://www.alibaba.com/Agricultural-Growing-Media_pid144';
+var count = 127
+    , exitF = false;
+var categoryFolder = 'Agriculture';
+var subCategoryFolder = 'Agricultural Growing Media';
+var fs = require('fs');
+var myfile = 'dataFiles/categoryURL.json';
+var fileData = fs.read(myfile);
+//console.log(fileData);
+fileData = JSON.parse(fileData);
+//console.log(fileData[0].url);
+casper.start(fileData[0].url);
+var primIndex = 0;
+var urlPrefix = fileData[primIndex].url.substr(fileData[primIndex].url.indexOf('_') + 4);
+console.log(urlPrefix);
+
+function categoryScrap() {
+    if (primIndex == fileData.length) {}
+    else {
+        urlPrefix = fileData[primIndex].url.substr(fileData[primIndex].url.indexOf('_') + 4);
+        casper.thenOpen(fileData[primIndex].url);
+        categoryFolder = fileData[primIndex].category;
+        subCategoryFolder = fileData[primIndex].textContent;
+        console.log('starting of scrap function b');
+        var exitF = true;
+        count = 1;
+
+        function scrap() {
+            casper.then(function () {
+                if (this.currentUrl.indexOf('login') > 0) {
+                    casper.back();
+                }
+                if (this.currentUrl.indexOf('login') > 0) {
+                    casper.back();
+                }
+                if (this.currentUrl.indexOf('login') > 0) {
+                    casper.back();
+                }
+
+		if (this.currentUrl.indexOf('login') > 0) {
+                    
+                }
+            });
+            casper.wait(100, function () {
+                exitF = this.evaluate(function () {
+                    var text = document.querySelector('body > div.l-page > div.l-page-main > div.l-main-content > div.l-grid.l-grid-sub > div.l-col-main > div > div:nth-child(1) > div > div > div.right > div');
+                    if (text != null) {
+                        if (text.textContent.indexOf('Your browsing did not match any products') > 0) return false;
+                    }
+                    else return true;
+                })
+                console.log(' :-' + exitF);
+                casper.wait(200, function () {
+                    casper.scrollTo(10, 300);
+                });
+                casper.wait(200, function () {
+                    casper.scrollTo(10, 600);
+                });
+                casper.wait(200, function () {
+                    casper.scrollTo(10, 900);
+                });
+                casper.wait(200, function () {
+                    casper.scrollTo(10, 1300);
+                });
+                casper.wait(200, function () {
+                    casper.scrollTo(10, 1700);
+                });
+                casper.wait(200, function () {
+                    casper.scrollTo(10, 2100);
+                });
+                casper.wait(200, function () {
+                    casper.scrollTo(10, 2500);
+                });
+                casper.wait(200, function () {
+                    casper.scrollTo(10, 2900);
+                });
+            });
+            if (exitF != false) {
+                casper.wait(5000, function () {
+                    console.log('working');
+                    casper.capture('temp.png');
+                    imgURL = this.evaluate(function () {
+                        var categoryFolder = 'Agriculture';
+                        var subCategoryFolder = 'Agricultural Growing Media';
+                        var tempArr = '';
+                        var temp = document.querySelectorAll('.m-gallery-product-item img');
+                        for (var iterate = 0; iterate < temp.length; iterate++) {
+                            tempArr += '{"folder":"' + categoryFolder + '","subfolder":"' + subCategoryFolder + '","url":"' + temp[iterate].parentElement.getAttribute('href') + '","src":"' + temp[iterate].getAttribute('src') + '"}';
+                            if (iterate != temp.length - 1) tempArr += ',';
+                        }
+                        return tempArr;
+                    });
+                    console.log(this.currentUrl);
+                    //console.log(imgURL);
+                })
+                casper.wait(1000, function () {
+                    var fs = require('fs');
+                    var myfile = 'dataFiles/' + categoryFolder + '/' + subCategoryFolder + '/productImageSrc_' + count + '.json';
+                    fs.write(myfile, imgURL, 'w');
+                    console.log(count);
+                    casper.capture('screebshot/secondpage' + count + '.png');
+                    count++;
+                })
+                casper.thenOpen('https://www.alibaba.com/catalogs/products/CID' + urlPrefix + '----------------------------G/' + count);
+            }
+            casper.run(function () {
+                console.log('Exiting scrap method :-' + exitF);
+                if (exitF == false) {
+                    exitF = false;
+                    primIndex++;
+                    categoryScrap();
+                }
+                else if (exitF == true) {
+                    console.log('Exiting scrap method');
+                    scrap();
+                }
+            });
+        }
+        scrap();
+    }
+}
+categoryScrap();
+//FETCH HTML, LINKS, IMAGES OF PRODUCT PAGES
+/*var casper = require('casper').create();
+
+var selecpath = require('casper').selectXPath;
+var links = '';
+var loopCount=0;
+var conti=true;
+casper.start('https://www.alibaba.com/Agricultural-Growing-Media_pid144');
+casper.then(function(){
+		loopCount = this.evaluate(function(){
+			return document.querySelector('.ui2-pagination-pages > span[class=disable]').textContent;
+		});
+});
+
+function scrapImagenLink(){
+    loopCount++;
+	casper.then(function () {
+		if(this.currentUrl.indexOf('login')>=0)
+		{
+			casper.back();
+			casper.wait(500);
+		}
+		casper.wait(100, function () {
+			casper.scrollTo(10, 300);
+		});
+		casper.wait(100, function () {
+			casper.scrollTo(10, 600);
+		});
+		casper.wait(100, function () {
+			casper.scrollTo(10, 900);
+		});
+		casper.wait(100, function () {
+			casper.scrollTo(10, 1300);
+		});
+		casper.wait(100, function () {
+			casper.scrollTo(10, 1700);
+		});
+		casper.wait(100, function () {
+			casper.scrollTo(10, 2100);
+		});
+		casper.wait(100, function () {
+			casper.scrollTo(10, 2500);
+		});
+		casper.wait(100, function () {
+			casper.scrollTo(10, 2900);
+		});
+		casper.wait(100, function () {
+			casper.scrollTo(10, 3000);
+		});
+	});
+
+	casper.wait(5000, function () {
+		console.log('working');
+		
+		var imgURL = this.evaluate(function () {
+			var tempArr = [];
+			var temp = document.querySelectorAll('body > div.l-page > div.l-page-main > div.l-main-content > div.l-grid.l-grid-sub.l-grid-extra > div.l-col-main > div > div:nth-child(4) img');
+			for (var iterate = 0; iterate < temp.length; iterate++) {
+
+				tempArr[iterate] = '"imgURL":' + '"' + temp[iterate].getAttribute('src') + '",productLink":"' +temp[iterate].parentNode.getAttribute('href') + '"';
+			}
+			return tempArr;
+		});
+		console.log(tempArr);
+		this.evaluate(function(){
+			var classNames = document.querySelector('.ui2-pagination-pages >.next').getAttribute('class');
+			if(classNames.indexOf('disable')>=0)
+			{
+				conti = false;
+			}
+		});
+	})
+	
+	casper.then(function(){
+		//loopCount--;
+		console.log('clicked');
+        var html = this.evaluate(function(){
+            return document.querySelector('.ui2-pagination-pages');
+        });
+        console.log(html);
+        casper.capture('inner.png');
+		var url = this.evaluate(function(){
+            return document.querySelector('.ui2-pagination-pages > a[class=next]').getAttribute('href');
+        });
+        console.log(url);
+        casper.thenOpen(url);
+	});
+	casper.wait(15000,function(){
+		casper.capture('screenshot/temp'+loopCount+'.png');
+		this.evaluate(function(){
+		});
+	});
+	if(conti==true)
+	casper.run(function () {
+		//	scrapImagenLink();
+        conti=false;
+		
+	});
+	else
+		casper.exit();
+	
+}
+
+scrapImagenLink();
+*/
