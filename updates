@@ -1,0 +1,166 @@
+import scrapy
+from scrapy.contrib.spiders import CrawlSpider
+#from scrapy.linkextractors import LinkExtractor
+#from scrapy.selector import Selector
+#from twisted.python import log as twisted_log
+import time
+import json
+import logging
+from random import randint
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.support import expected_conditions as EC    
+import sys
+import httplib
+class MySpider(CrawlSpider):
+    name = 'adflyN'
+    start_urls = ['http://159.203.227.233/read.php']
+    
+    def __init__(self):
+        self.userAgent = ["Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1",
+                            "Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11",
+                            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1092.0 Safari/536.6",
+                            "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1090.0 Safari/536.6",
+                            "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/19.77.34.5 Safari/537.1",
+                            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.9 Safari/536.5",
+                            "Mozilla/5.0 (Windows NT 6.0) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.5",
+                            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3",
+                            "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3",
+                            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_0) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3",
+                            "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3",
+                            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3",
+                            "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3",
+                            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3",
+                            "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3",
+                            "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.0 Safari/536.3",
+                            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24",
+                            "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24",
+			    "Mozilla/5.0 (Linux; U; Android 4.1.1; en-gb; Build/KLP) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30",
+			    "Mozilla/5.0 (Linux; Android 4.4; Nexus 5 Build/_BuildID_) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36",
+			    "Mozilla/5.0 (Linux; Android 5.1.1; Nexus 5 Build/LMY48B; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/43.0.2357.65 Mobile Safari/537.36",
+			    "Mozilla/5.0 (iPad; CPU OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) CriOS/30.0.1599.12 Mobile/11A465 Safari/8536.25 (3B92C18B-D9DE-4CB7-A02A-22FD2AF17C8F)",
+			    "Mozilla/5.0 (iPad; CPU OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11A465 Twitter for iPhone",
+			    "Mozilla/5.0 (iPhone; CPU iPhone OS 6_1_3 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10B329 Safari/8536.25",
+			    "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 6P Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.83 Mobile Safari/537.36",
+			    "Mozilla/5.0 (Linux; Android 7.0; Pixel C Build/NRD90M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/52.0.2743.98 Safari/537.36",
+			    "Mozilla/5.0 (Linux; Android 4.4.3; KFTHWI Build/KTU84M) AppleWebKit/537.36 (KHTML, like Gecko) Silk/47.1.79 like Chrome/47.0.2526.80 Safari/537.36",
+			    "Mozilla/5.0 (Linux; Android 6.0; HTC One M9 Build/MRA58K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.98 Mobile Safari/537.36",
+			    "Mozilla/5.0 (Linux; Android 5.1.1; SHIELD Tablet Build/LMY48C) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.98 Safari/537.36",
+			    "Mozilla/5.0 (Linux; Android 5.0.2; SAMSUNG SM-T550 Build/LRX22G) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/3.3 Chrome/38.0.2125.102 Safari/537.36",
+			    "Mozilla/5.0 (Linux; Android 4.2.2; AFTB Build/JDQ39) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.173 Mobile Safari/537.22",
+			    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36",
+			    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.8 (KHTML, like Gecko) Version/9.1.3 Safari/601.7.8",
+			    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12) AppleWebKit/602.1.50 (KHTML, like Gecko) Version/10.0 Safari/602.1.50",
+			    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586",
+			    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/51.0.2704.79 Chrome/51.0.2704.79 Safari/537.36",
+			    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36",
+			    "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:49.0) Gecko/20100101 Firefox/49.0",
+			    "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0; Trident/5.0)",
+			    "Mozilla/5.0 (iPad; CPU OS 9_1 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) CriOS/46.0.2490.73 Mobile/13B143 Safari/600.1.4 (000119)",
+			    "Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B367 Safari/531.21.10 BLACKBERRY",
+			    "Mozilla/5.0 (iPad; CPU OS 9_0_2 like Mac OS X) AppleWebKit/601.1 (KHTML, like Gecko) CriOS/53.0.2785.86 Mobile/13A452 Safari/601.1.46",
+			    "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_3 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B511",
+			    "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.12 Safari/537.36 OPR/14.0.1116.4"]
+        self.viewport = [[1240,768],[500,500],[1280,768],[1366,768],[1440,768],[1920,1080],[540,960],[480,854],[720,1280],[424,553],[600,800],[533,853]]
+     
+    def scrapStart(self,response):
+        
+        while True:
+            if True:
+                logText = ''
+                jsonresponse = json.loads(response.body_as_unicode())
+                proxyList = jsonresponse["proxy"].split(",")
+                publisherURL = jsonresponse["publisherURL"].split(",")
+                stopC = jsonresponse["stop"]
+                initialDelayS = jsonresponse["Period1"]
+                initialDelayE = jsonresponse["Period1T"]
+
+                clickDelayS = jsonresponse["adflyDelay"]
+                clickDelayE = jsonresponse["adflyDelayT"]
+
+                clickFDelayS = jsonresponse["clickFrequency"]
+                clickFDelayE = jsonresponse["clickFrequencyT"]
+
+                stayDelayS = jsonresponse["stayDelay"]
+                stayDelayE = jsonresponse["stayDelayT"]
+                iterate = 0
+                dcap = dict(DesiredCapabilities.PHANTOMJS)
+                while iterate<20:
+                    iterate = iterate+1
+                    if stopC == '0':
+                           if True:
+                                
+                                us = self.userAgent[randint(0,42)]
+                                #self.logger.info('OPENED 23')
+                                dcap["phantomjs.page.settings.userAgent"] = us
+                                openedURL = publisherURL[randint(0,len(publisherURL)-1)] #'http://makerhorse.com'
+                                proxyC = '--proxy=' + proxyList[randint(0,len(proxyList)-1)] 
+                                proxy_args = [
+                                #'--proxy=124.88.67.32:843',
+                                proxyC,
+                                '--proxy-type=http',
+                                ]
+                                self.unitDriver = webdriver.PhantomJS(service_args=proxy_args,desired_capabilities=dcap)
+                                num = randint(0,11)
+                                self.unitDriver.set_window_size(self.viewport[num][0],self.viewport[num][1])
+                                self.unitDriver.get('http://159.203.227.233/test.php')#openedURL.strip())
+                                
+                                logText = logText + ' Publisher URL ' + openedURL.strip() + ' __ Proxy ' + proxyC.strip() + ' __ User Agent ' + us 
+                                logText	= logText + ' __ Viewport is %d * %d ' % (self.viewport[num][0],self.viewport[num][1])
+                                logText = logText + '\n'
+                                url = []
+                                url = self.unitDriver.find_elements_by_css_selector('a[href*=adf]')
+                                logText = logText + '-'
+                                time.sleep(5)
+                                self.unitDriver.save_screenshot('out2.png')
+                                if len(url)>0:
+                                    ntm = randint(0,len(url)-1)
+				    ntm = ntm%10
+                                    try:                             
+                                        url[ntm].click()
+				    except:
+					try:
+					    self.unitDriver.execute_script('document.querySelectorAll("a[href*=adf]")[Math.floor((Math.random() * document.querySelectorAll("a[href*=adf]").length) + 0)].click();')
+					except:
+	                                    continue
+                                    #self.unitDriver.save_screenshot('out2.png')
+                                    #with open("data.txt", "a") as myfile:
+                                     #   myfile.write(self.unitDriver.page_source)                                    
+                                else:
+                                    continue
+                                time.sleep(8)
+                                logText = logText + '*'
+                                clicqF = randint(0,100)
+                                if clicqF > int(clickFDelayS) and clicqF < int(clickFDelayE):
+				    try:
+                                        self.unitDriver.switch_to_frame(self.unitDriver.find_element_by_tag_name("iframe"))
+                                        iframeElems = self.unitDriver.find_elements_by_css_selector('a')
+                                    	if len(iframeElems) > 0:
+					    iframeElems[randint(0,len(iframeElems)-1)].click()  
+                                        self.unitDriver.switch_to.default_content()
+                                        logText = logText + '/'
+				    except:
+	                                logText = logText + '*'
+				try:
+                                    self.unitDriver.find_element_by_id('skip_button').click()
+                                    logText = logText + '+'
+				except:
+                                    try:
+				        self.unitDriver.find_element_by_id('skip_button').click()
+                                        logText = logText + '+'
+                                    except:
+				        continue
+                                #logText = logText + '+'
+                                with open("../../html/logsNew_if.txt", "a") as myfile:
+                                    myfile.write(logText)
+                                self.unitDriver.close()
+                           else:
+                                logText+="ERROR"
+                                with open("logsNew_if.txt", "a") as myfile:
+                                    myfile.write(logText)
+                                self.unitDriver.close()
+            else:
+                with open("error.txt", "a") as myfile:
+                    myfile.write("Some Error Occured while getting config please chck the MySQL")
+    def parse(self, response):
+        self.scrapStart(response)
